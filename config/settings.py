@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bbp.apps.BbpConfig',
     'user.apps.UserConfig',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -137,3 +138,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'user.User'
+
+GRAPHENE = {
+    'SCHEMA': 'config.schema.schema',
+}
