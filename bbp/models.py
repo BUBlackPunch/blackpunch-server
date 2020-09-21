@@ -10,19 +10,19 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     catagory = models.ForeignKey(Catagory, on_delete=models.CASCADE)
     post_title = models.CharField(max_length=225)
-    post_content = models.TextField()
-    post_datatime = models.DateTimeField()
-    post_modify_datatime = models.DateTimeField(auto_now=True)
-    post_answer_count = models.IntegerField()
-    post_hits = models.IntegerField()
+    post_content = models.TextField(blank=True)
+    post_datatime = models.DateTimeField(auto_now_add=True)
+    post_modify_datatime = models.DateTimeField(auto_now=True, null=True)
+    post_answer_count = models.IntegerField(null=True)
+    post_hits = models.IntegerField(null=True)
     po_like = models.ManyToManyField("Like", through='Post_like')
 
 
 class Answer(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    as_content = models.TextField()
-    as_datetime = models.DateTimeField()
+    as_content = models.TextField(blank=True)
+    as_datetime = models.DateTimeField(auto_now_add=True)
     as_modify_datetime = models.DateTimeField(auto_now=True)
     as_like = models.ManyToManyField("Like", through='Answer_like')
 
@@ -30,8 +30,8 @@ class Answer(models.Model):
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
-    cm_content = models.CharField(max_length=200)
-    cm_datetime = models.DateTimeField()
+    cm_content = models.CharField(max_length=200, blank=True)
+    cm_datetime = models.DateTimeField(auto_now_add=True)
     cm_modify_datetime = models.DateTimeField(auto_now=True)
 
 
