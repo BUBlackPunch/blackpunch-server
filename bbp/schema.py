@@ -87,6 +87,7 @@ class CreateUser(graphene.Mutation):
             success=True
         )
 
+
 '''
 class InputUpdateUser(graphene.InputObjectType):
     username = graphene.String()
@@ -124,9 +125,75 @@ class UpdateUser(graphene.Mutation):
         return UpdateUser(
             success=True
         )
+
+ca_id 외래키 NOT NULL
+class CreatePost(graphene.Mutation):
+    class Arguments:
+        ca_id = graphene.Int(required=True)
+        title = graphene.String(required=True)
+        content = graphene.String(required=True)
+
+    id = graphene.Int()
+
+    def mutate(self, info, title, content, ca_id):
+        post = Post(post_title=title, post_content=content),
+        catagory = Catagory(id=ca_id),
+        post.save(),
+        catagory.save()
+
+        return CreatePost(
+            id=post.id
+        )
 '''
+
+
+class CreateCatagory(graphene.Mutation):
+    class Arguments:
+        ca_name = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, ca_name):
+        catagory = Catagory(ca_name=ca_name)
+        catagory.save()
+
+        return CreateCatagory(
+            success=True
+        )
+
+'''
+Manager' object is not callable
+class InputUpdateCatagory(graphene.InputObjectType):
+    ca_name = graphene.String()
+
+
+class UpdateCatagory(graphene.Mutation):
+    class Arguments:
+        ca_name = graphene.String(required=True)
+        data = InputUpdateCatagory(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(root, info, ca_name, data):
+        model = Catagory.objects(
+            ca_name=ca_name
+        ).first()
+
+        if data.ca_name is not None:
+            model.ca_name = ca_name
+
+        model.save()
+
+        return UpdateCatagory(
+            success=True
+        )
+'''
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    create_catagory = CreateCatagory.Field()
+#   update_catagory = UpdateCatagory.Field()
 #   update_user = UpdateUser.Field()
+#   create_post = CreatePost.Field()
 
 
