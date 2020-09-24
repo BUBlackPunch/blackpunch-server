@@ -1,10 +1,11 @@
 import graphene
 from graphene_django import DjangoObjectType
+from django.contrib.auth import get_user_model
 from bbp.models import User, Post, Answer, Tag, Comment, Catagory, Like
 
 class UserType(DjangoObjectType):
     class Meta:
-        model = User
+        model = get_user_model()
         exclude = ("is_superuser", "is_staff", "is_active")
 
 
@@ -43,7 +44,7 @@ class Query(graphene.ObjectType):
     tag = graphene.List(TagType)
 
     def resolve_user(self, info, **kwargs):
-        return User.objects.all()
+        return get_user_model().objects.all()
 
     def resolve_post(self, info, **kwargs):
         return Post.objects.all()
@@ -72,16 +73,16 @@ class CreateUser(graphene.Mutation):
 
     success = graphene.Boolean()
 
-    def mutate(self, info, **kwargs):
-        model = User(
-            username=kwargs.get("username"),
-            password=kwargs.get("password"),
-            nickname=kwargs.get("nickname"),
-            email=kwargs.get("email"),
-            first_name=kwargs.get("first_name"),
-            last_name=kwargs.get("last_name")
+    def mutate(self, info, username, password, email, nickname, first_name, last_name):
+        user = get_user_model()(
+            username=username,
+            email=email,
+            nickname=nickname,
+            first_name=first_name,
+            last_name=last_name,
         )
-        model.save()
+        user.set_password(password)
+        user.save()
 
         return CreateUser(
             success=True
@@ -89,11 +90,12 @@ class CreateUser(graphene.Mutation):
 
 
 '''
+UserManager' object is not callable
 class InputUpdateUser(graphene.InputObjectType):
     username = graphene.String()
-    password = graphene.String()
-    nickname = graphene.String()
-    email = graphene.String()
+    #password = graphene.String()
+    #nickname = graphene.String()
+    #email = graphene.String()
 
 
 class UpdateUser(graphene.Mutation):
@@ -104,28 +106,22 @@ class UpdateUser(graphene.Mutation):
     success = graphene.Boolean()
 
     def mutate(root, info, nickname, data):
-        model = User.objects(
+        model = get_user_model().objects(
             nickname=nickname
         ).first()
 
         if data.username is not None:
             model.username = data.username
 
-        if data.password is not None:
-            model.password = data.password
-
-        if data.nickname is not None:
-            model.nickname = data.nickname
-
-        if data.email is not None:
-            model.email = data.email
 
         model.save()
 
         return UpdateUser(
             success=True
         )
+'''
 
+'''
 ca_id 외래키 NOT NULL
 class CreatePost(graphene.Mutation):
     class Arguments:
