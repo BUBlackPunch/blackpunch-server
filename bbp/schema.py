@@ -1,12 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
-from django.contrib.auth import get_user_model
-from bbp.models import User, Post, Answer, Tag, Comment, Catagory, Like
+from bbp.models import Post, Answer, Tag, Comment, Catagory, Like
 
-class UserType(DjangoObjectType):
-    class Meta:
-        model = get_user_model()
-        exclude = ("is_superuser", "is_staff", "is_active")
+
 
 
 class PostType(DjangoObjectType):
@@ -37,14 +33,11 @@ class TagType(DjangoObjectType):
 
 class Query(graphene.ObjectType):
     post = graphene.List(PostType)
-    user = graphene.List(UserType)
     answer = graphene.List(AnswerType)
     catagory = graphene.List(CatagoryType)
     comment = graphene.List(CommentType)
     tag = graphene.List(TagType)
 
-    def resolve_user(self, info, **kwargs):
-        return get_user_model().objects.all()
 
     def resolve_post(self, info, **kwargs):
         return Post.objects.all()
@@ -61,32 +54,6 @@ class Query(graphene.ObjectType):
     def resolve_tag(self, info, **kwargs):
         return Tag.objects.all()
 
-
-class CreateUser(graphene.Mutation):
-    class Arguments:
-        username = graphene.String(required=True)
-        password = graphene.String(required=True)
-        nickname = graphene.String(required=True)
-        email = graphene.String(required=True)
-        first_name = graphene.String(required=True)
-        last_name = graphene.String(required=True)
-
-    success = graphene.Boolean()
-
-    def mutate(self, info, username, password, email, nickname, first_name, last_name):
-        user = get_user_model()(
-            username=username,
-            email=email,
-            nickname=nickname,
-            first_name=first_name,
-            last_name=last_name,
-        )
-        user.set_password(password)
-        user.save()
-
-        return CreateUser(
-            success=True
-        )
 
 
 '''
@@ -186,7 +153,6 @@ class UpdateCatagory(graphene.Mutation):
 '''
 
 class Mutation(graphene.ObjectType):
-    create_user = CreateUser.Field()
     create_catagory = CreateCatagory.Field()
 #   update_catagory = UpdateCatagory.Field()
 #   update_user = UpdateUser.Field()

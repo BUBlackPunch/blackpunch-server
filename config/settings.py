@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bbp.apps.BbpConfig',
+    'users.apps.UsersConfig',
     'graphene_django',
 ]
 
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -136,12 +138,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-AUTH_USER_MODEL = 'bbp.User'
+AUTH_USER_MODEL = 'users.User'
 
 GRAPHENE = {
     'SCHEMA': 'config.schema.schema',
     'MIDDLEWARE': [
-        'graphql_jwt.middle.JSONWebTokenMiddleware',
+        'graphql_jwt.middleware.JSONWebTokenMiddleware',
     ],
 }
 
