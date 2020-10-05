@@ -126,6 +126,40 @@ class CreatePost(graphene.Mutation):
         )
 
 
+class CreateAnswer(graphene.Mutation):
+    class Arguments:
+        post_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+        content = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(root, info, post_id, content, user_id):
+        post = Post.objects.get(id=post_id)
+        user = User.objects.get(id=user_id)
+        answer = Answer.objects.create(post=post, user=user, as_content=content)
+        return CreateAnswer(
+            success=True
+        )
+
+
+class CreateComment(graphene.Mutation):
+    class Arguments:
+        answer_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+        content = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(root, info, answer_id, content, user_id):
+        answer = Answer.objects.get(id=answer_id)
+        user = User.objects.get(id=user_id)
+        comment = Comment.objects.create(answer=answer, user=user, cm_content=content)
+        return CreateComment(
+            success=True
+        )
+
+
 class CreateCatagory(graphene.Mutation):
     class Arguments:
         ca_name = graphene.String(required=True)
@@ -137,6 +171,19 @@ class CreateCatagory(graphene.Mutation):
         catagory.save()
 
         return CreateCatagory(
+            success=True
+        )
+
+
+class CreateTag(graphene.Mutation):
+    class Arguments:
+        tag_name = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(root, info, tag_name):
+        tag = Tag.objects.create(tag_name=tag_name)
+        return CreateTag(
             success=True
         )
 
@@ -189,6 +236,9 @@ class UpdateCatagory(graphene.Mutation):
 
 class Mutation(graphene.ObjectType):
     create_post = CreatePost.Field()
+    create_answer = CreateAnswer.Field()
+    create_comment = CreateComment.Field()
+    create_tag = CreateTag.Field()
     create_catagory = CreateCatagory.Field()
     update_post = UpdatePost.Field()
 #   update_catagory = UpdateCatagory.Field()
