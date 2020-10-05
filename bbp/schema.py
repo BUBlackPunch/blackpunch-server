@@ -1,6 +1,6 @@
 import graphene
 from graphene_django import DjangoObjectType
-from bbp.models import Post, Answer, Tag, Comment, Catagory, Like
+from bbp.models import Post, Answer, Tag, Comment, Catagory, User
 
 
 
@@ -108,6 +108,22 @@ class CreatePost(graphene.Mutation):
             id=post.id
         )
 '''
+class CreatePost(graphene.Mutation):
+    class Arguments:
+        ca_id = graphene.Int(required=True)
+        user_id = graphene.Int(required=True)
+        title = graphene.String(required=True)
+        content = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(root, info, ca_id, title, content, user_id):
+        catagory = Catagory.objects.get(id=ca_id)
+        user = User.objects.get(id=user_id)
+        post = Post.objects.create(catagory=catagory, user=user, post_title=title, post_content=content)
+        return CreatePost(
+            success=True
+        )
 
 
 class CreateCatagory(graphene.Mutation):
@@ -123,6 +139,25 @@ class CreateCatagory(graphene.Mutation):
         return CreateCatagory(
             success=True
         )
+
+
+class UpdatePost(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+        title = graphene.String()
+        content = graphene.String()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, title, content):
+        post = Post.objects.get(pk=id)
+        post.post_title = title if title is not None else post_title
+        post.post_content = content if content is not None else post_content
+        post.save()
+        return UpdatePost(
+            success=True
+        )
+
 
 '''
 Manager' object is not callable
@@ -153,9 +188,10 @@ class UpdateCatagory(graphene.Mutation):
 '''
 
 class Mutation(graphene.ObjectType):
+    create_post = CreatePost.Field()
     create_catagory = CreateCatagory.Field()
+    update_post = UpdatePost.Field()
 #   update_catagory = UpdateCatagory.Field()
 #   update_user = UpdateUser.Field()
-#   create_post = CreatePost.Field()
 
 
