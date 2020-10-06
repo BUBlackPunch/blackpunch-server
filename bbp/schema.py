@@ -56,58 +56,7 @@ class Query(graphene.ObjectType):
 
 
 
-'''
-UserManager' object is not callable
-class InputUpdateUser(graphene.InputObjectType):
-    username = graphene.String()
-    #password = graphene.String()
-    #nickname = graphene.String()
-    #email = graphene.String()
 
-
-class UpdateUser(graphene.Mutation):
-    class Arguments:
-        nickname = graphene.String(required=True)
-        data = InputUpdateUser(default_value=False)
-
-    success = graphene.Boolean()
-
-    def mutate(root, info, nickname, data):
-        model = get_user_model().objects(
-            nickname=nickname
-        ).first()
-
-        if data.username is not None:
-            model.username = data.username
-
-
-        model.save()
-
-        return UpdateUser(
-            success=True
-        )
-'''
-
-'''
-ca_id 외래키 NOT NULL
-class CreatePost(graphene.Mutation):
-    class Arguments:
-        ca_id = graphene.Int(required=True)
-        title = graphene.String(required=True)
-        content = graphene.String(required=True)
-
-    id = graphene.Int()
-
-    def mutate(self, info, title, content, ca_id):
-        post = Post(post_title=title, post_content=content),
-        catagory = Catagory(id=ca_id),
-        post.save(),
-        catagory.save()
-
-        return CreatePost(
-            id=post.id
-        )
-'''
 class CreatePost(graphene.Mutation):
     class Arguments:
         ca_id = graphene.Int(required=True)
@@ -122,6 +71,40 @@ class CreatePost(graphene.Mutation):
         user = User.objects.get(id=user_id)
         post = Post.objects.create(catagory=catagory, user=user, post_title=title, post_content=content)
         return CreatePost(
+            success=True
+        )
+
+
+class UpdatePost(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        title = graphene.String(required=False)
+        content = graphene.String(required=False)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, title, content):
+        post = Post.objects.get(pk=id)
+        post.post_title = title if title is not None else post_title
+        post.post_content = content if content is not None else post_content
+        post.save()
+        return UpdatePost(
+            success=True
+        )
+
+
+class DeletePost(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        post = Post.objects.get(pk=id)
+        if post is not None:
+            post.delete()
+
+        return DeletePost(
             success=True
         )
 
@@ -143,6 +126,38 @@ class CreateAnswer(graphene.Mutation):
         )
 
 
+class UpdateAnswer(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        content = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, content):
+        answer = Answer.objects.get(pk=id)
+        answer.as_content = content if content is not None else as_content
+        answer.save()
+        return UpdateAnswer(
+            success=True
+        )
+
+
+class DeleteAnswer(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        answer = Answer.objects.get(pk=id)
+        if answer is not None:
+            answer.delete()
+
+        return DeleteAnswer(
+            success=True
+        )
+
+
 class CreateComment(graphene.Mutation):
     class Arguments:
         answer_id = graphene.Int(required=True)
@@ -156,6 +171,39 @@ class CreateComment(graphene.Mutation):
         user = User.objects.get(id=user_id)
         comment = Comment.objects.create(answer=answer, user=user, cm_content=content)
         return CreateComment(
+            success=True
+        )
+
+
+class UpdateComment(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        content = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, content):
+        comment = Comment.objects.get(pk=id)
+        comment.cm_content = content if content is not None else cm_content
+        comment.save()
+        return UpdateAnswer(
+            success=True
+        )
+
+
+class DeleteComment(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        comment = Comment.objects.get(pk=id)
+
+        if comment is not None:
+            comment.delete()
+
+        return DeleteComment(
             success=True
         )
 
@@ -175,6 +223,38 @@ class CreateCatagory(graphene.Mutation):
         )
 
 
+class UpdateCatagory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID(required=True)
+        name = graphene.String(required=True)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id, name):
+        catagory = Catagory.objects.get(pk=id)
+        catagory.ca_name = name if name is not None else ca_name
+        catagory.save()
+        return UpdateAnswer(
+            success=True
+        )
+
+
+class DeleteCatagory(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        catagory = Catagory.objects.get(pk=id)
+        if catagory is not None:
+            catagory.delete()
+
+        return DeleteCatagory(
+            success=True
+        )
+
+
 class CreateTag(graphene.Mutation):
     class Arguments:
         tag_name = graphene.String(required=True)
@@ -188,51 +268,7 @@ class CreateTag(graphene.Mutation):
         )
 
 
-class UpdatePost(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID()
-        title = graphene.String()
-        content = graphene.String()
 
-    success = graphene.Boolean()
-
-    def mutate(self, info, id, title, content):
-        post = Post.objects.get(pk=id)
-        post.post_title = title if title is not None else post_title
-        post.post_content = content if content is not None else post_content
-        post.save()
-        return UpdatePost(
-            success=True
-        )
-
-
-'''
-Manager' object is not callable
-class InputUpdateCatagory(graphene.InputObjectType):
-    ca_name = graphene.String()
-
-
-class UpdateCatagory(graphene.Mutation):
-    class Arguments:
-        ca_name = graphene.String(required=True)
-        data = InputUpdateCatagory(required=True)
-
-    success = graphene.Boolean()
-
-    def mutate(root, info, ca_name, data):
-        model = Catagory.objects(
-            ca_name=ca_name
-        ).first()
-
-        if data.ca_name is not None:
-            model.ca_name = ca_name
-
-        model.save()
-
-        return UpdateCatagory(
-            success=True
-        )
-'''
 
 class Mutation(graphene.ObjectType):
     create_post = CreatePost.Field()
@@ -241,7 +277,12 @@ class Mutation(graphene.ObjectType):
     create_tag = CreateTag.Field()
     create_catagory = CreateCatagory.Field()
     update_post = UpdatePost.Field()
-#   update_catagory = UpdateCatagory.Field()
-#   update_user = UpdateUser.Field()
+    update_answer = UpdateAnswer.Field()
+    update_comment = UpdateComment.Field()
+    update_catagory = UpdateCatagory.Field()
+    delete_post = DeletePost.Field()
+    delete_answer = DeleteAnswer.Field()
+    delete_comment = DeleteComment.Field()
+    delete_catagory = DeleteCatagory.Field()
 
 

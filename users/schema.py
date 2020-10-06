@@ -52,5 +52,44 @@ class CreateUser(graphene.Mutation):
         )
 
 
+class UpdateUser(graphene.Mutation):
+    class Arguments:
+        username = graphene.String(required=True)
+        email = graphene.String(default_value=False)
+        nickname = graphene.String(default_value=False)
+        password = graphene.String(default_value=False)
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, username, email, nickname, password):
+        user = User.objects.get(username=username)
+        user.email = email if email is not None else email
+        user.nickname = nickname if nickname is not None else nickname
+        user.password = password if password is not None else password
+        user.save()
+        return UpdateUser(
+            success=True
+        )
+
+
+class DeleteUser(graphene.Mutation):
+    class Arguments:
+        id = graphene.ID()
+
+    success = graphene.Boolean()
+
+    def mutate(self, info, id):
+        user = User.objects.get(pk=id)
+        if user is not None:
+            user.delete()
+
+        return DeleteUser(
+            success=True
+        )
+
+
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
+    update_user = UpdateUser.Field()
+    delete_user = DeleteUser.Field()
+
