@@ -55,9 +55,9 @@ class CreateUser(graphene.Mutation):
 class UpdateUser(graphene.Mutation):
     class Arguments:
         username = graphene.String(required=True)
-        email = graphene.String(default_value=False)
-        nickname = graphene.String(default_value=False)
-        password = graphene.String(default_value=False)
+        email = graphene.String(required=True)
+        nickname = graphene.String(required=True)
+        password = graphene.String(required=True)
 
     success = graphene.Boolean()
 
