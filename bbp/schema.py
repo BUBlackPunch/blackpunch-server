@@ -48,11 +48,6 @@ class Query(graphene.ObjectType):
         if id is not None:
             return Post.objects.get(id=id)
 
-    def resolve_post_test(self, info, **kwargs):
-        ts = kwargs.get("id")
-        if id is not None:
-            return Post.objects.get(id=id)
-
     def resolve_answer(self, info, **kwargs):
         return Answer.objects.all()
 
@@ -98,6 +93,14 @@ class UpdatePost(graphene.Mutation):
         post = Post.objects.get(pk=id)
         post.post_title = title if title is not None else post_title
         post.post_content = content if content is not None else post_content
+        post.save()
+        return UpdatePost(
+            success=True
+        )
+
+    def mutate(self, info, id, title):
+        post = Post.objects.get(pk=id)
+        post.post_title = title if title is not None else post_title
         post.save()
         return UpdatePost(
             success=True
